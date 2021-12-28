@@ -23,14 +23,14 @@
           </a-col>
           <a-col :md="5" :sm="24">
             <a-form-item label="创建时间">
-              <a-range-picker style="width: 100%;" @change="onDatePickerChange" />
+              <a-range-picker style="width: 100%" @change="onDatePickerChange" />
             </a-form-item>
           </a-col>
 
           <a-col :md="4" :sm="24">
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="handleSearch" :loading="loadingState.query">查询</a-button>
-              <a-button style="margin-left: 8px;" @click="handleSearchReset" :loading="loadingState.reset">
+              <a-button style="margin-left: 8px" @click="handleSearchReset" :loading="loadingState.reset">
                 重置
               </a-button>
             </span>
@@ -47,7 +47,7 @@
           <!-- lock | unlock -->
           <a-menu-item key="2" v-action:update @click="handleLockUserInBatch()"><a-icon type="lock" />锁定</a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px;"> 批量操作 <a-icon type="down" /> </a-button>
+        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /> </a-button>
       </a-dropdown>
     </div>
 
@@ -98,20 +98,20 @@
       </template>
     </s-table>
 
-    <user-modal ref="modal" @ok="handleModalOk"></user-modal>
+    <!-- <user-modal ref="modal" @ok="handleModalOk"></user-modal> -->
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
-import UserModal from './modules/UserModal'
+// import UserModal from './modules/UserModal'
 
 import userApi from '@/api/user'
 export default {
   name: 'UserList',
   components: {
-    STable,
-    UserModal
+    STable
+    // UserModal,
   },
   data () {
     return {
@@ -206,32 +206,35 @@ export default {
         }
       ],
       // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
+      loadData: (parameter) => {
         const queryRequest = {}
         queryRequest.current = parameter.pageNo
         queryRequest.pageSize = parameter.pageSize
         Object.assign(queryRequest, this.queryParam)
 
         this.$log.debug('loadData request parameters:', queryRequest)
-        return userApi.list(queryRequest).then(res => {
-          console.log(res.data)
-          return {
-            pageSize: res.data.pageSize,
-            pageNo: res.data.current,
-            totalCount: res.data.total,
-            totalPage: res.data.pages,
-            data: res.data.list
-          }
-        }).catch(err => {
-          this.$message.error(`查询出错:${err}`)
-          return {
-            pageSize: 0,
-            pageNo: 1,
-            totalCount: 0,
-            totalPage: 0,
-            data: []
-          }
-        })
+        return userApi
+          .list(queryRequest)
+          .then((res) => {
+            console.log(res.data)
+            return {
+              pageSize: res.data.pageSize,
+              pageNo: res.data.current,
+              totalCount: res.data.total,
+              totalPage: res.data.pages,
+              data: res.data.list
+            }
+          })
+          .catch((err) => {
+            this.$message.error(`查询出错:${err}`)
+            return {
+              pageSize: 0,
+              pageNo: 1,
+              totalCount: 0,
+              totalPage: 0,
+              data: []
+            }
+          })
       },
 
       selectedRowKeys: [],
@@ -262,7 +265,7 @@ export default {
       record[column.dataIndex] = value
     },
     // eslint-disable-next-line
-    del (row) {
+    del(row) {
       this.$log.debug('删除用户:', row.username)
       this.handleDeleteUser(`真的要删除用户 ${row.username} 吗?`, [row.username])
     },
@@ -279,7 +282,7 @@ export default {
         okType: 'danger',
         cancelText: '取消',
         onOk () {
-          userApi.deleteUser(userNames).then(res => {
+          userApi.deleteUser(userNames).then((res) => {
             that.$message.success('删除用户成功')
             that.$refs.table.refresh()
           })
@@ -327,7 +330,7 @@ export default {
         cancelText: '取消',
         onOk () {
           that.$log.debug('重置用户密码', row.username)
-          userApi.resetPassword(row.username).then(res => {
+          userApi.resetPassword(row.username).then((res) => {
             that.$message.success('重置密码成功')
           })
         },
@@ -349,7 +352,7 @@ export default {
         cancelText: '取消',
         onOk () {
           that.$log.debug('所用用户', userNames)
-          userApi.lockUser(userNames).then(res => {
+          userApi.lockUser(userNames).then((res) => {
             that.$message.success('锁定用户成功')
             that.$refs.table.refresh()
           })
