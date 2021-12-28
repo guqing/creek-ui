@@ -98,26 +98,26 @@
       </template>
     </s-table>
 
-    <!-- <user-modal ref="modal" @ok="handleModalOk"></user-modal> -->
+    <user-modal ref="modal" @ok="handleModalOk"></user-modal>
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
-// import UserModal from './modules/UserModal'
+import UserModal from './components/UserModal'
 
 import userApi from '@/api/user'
 export default {
   name: 'UserList',
   components: {
-    STable
-    // UserModal,
+    STable,
+    UserModal,
   },
   data () {
     return {
       loadingState: {
         query: false,
-        reset: false
+        reset: false,
       },
       rangePicker: null,
       // 查询参数
@@ -125,18 +125,18 @@ export default {
       pagination: {
         current: 1,
         pageSize: 10,
-        total: 0
+        total: 0,
       },
       tagColors: ['pink', 'orange', 'green', 'blue', 'purple'],
       // 表头
       columns: [
         {
           title: '用户名',
-          dataIndex: 'username'
+          dataIndex: 'username',
         },
         {
           title: '昵称',
-          dataIndex: 'nickname'
+          dataIndex: 'nickname',
         },
         {
           title: '性别',
@@ -150,7 +150,7 @@ export default {
               default:
                 return <a-tag>保密</a-tag>
             }
-          }
+          },
         },
         {
           title: '邮箱',
@@ -160,7 +160,7 @@ export default {
               return text
             }
             return '未知'
-          }
+          },
         },
         {
           title: '手机号',
@@ -171,12 +171,12 @@ export default {
               return text
             }
             return '未知'
-          }
+          },
         },
         {
           title: '角色',
           dataIndex: 'roleNames',
-          scopedSlots: { customRender: 'roleNames' }
+          scopedSlots: { customRender: 'roleNames' },
         },
         {
           title: '状态',
@@ -190,20 +190,20 @@ export default {
               default:
                 return '禁用'
             }
-          }
+          },
         },
         {
           title: '创建时间',
           dataIndex: 'createTime',
           sorter: true,
-          scopedSlots: { customRender: 'createTime' }
+          scopedSlots: { customRender: 'createTime' },
         },
         {
           table: '操作',
           title: '操作',
           dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
-        }
+          scopedSlots: { customRender: 'action' },
+        },
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: (parameter) => {
@@ -222,7 +222,7 @@ export default {
               pageNo: res.data.current,
               totalCount: res.data.total,
               totalPage: res.data.pages,
-              data: res.data.list
+              data: res.data.list,
             }
           })
           .catch((err) => {
@@ -232,20 +232,20 @@ export default {
               pageNo: 1,
               totalCount: 0,
               totalPage: 0,
-              data: []
+              data: [],
             }
           })
       },
 
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
     }
   },
   computed: {
     rowSelection () {
       return {
         selectedRowKeys: this.selectedRowKeys,
-        onChange: this.onSelectChange
+        onChange: this.onSelectChange,
       }
     },
     tagColor () {
@@ -258,7 +258,7 @@ export default {
     },
     tableOpsVisible () {
       return this.selectedRowKeys.length > 0
-    }
+    },
   },
   methods: {
     handleChange (value, key, column, record) {
@@ -289,7 +289,7 @@ export default {
         },
         onCancel () {
           that.$log.info('Cancel')
-        }
+        },
       })
     },
     onSelectChange (selectedRowKeys, selectedRows) {
@@ -336,7 +336,7 @@ export default {
         },
         onCancel () {
           that.$log.info('Cancel')
-        }
+        },
       })
     },
     handleLockUserInBatch () {
@@ -359,10 +359,10 @@ export default {
         },
         onCancel () {
           that.$log.info('Cancel')
-        }
+        },
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
