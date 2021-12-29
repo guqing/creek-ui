@@ -19,11 +19,14 @@
         </a-spin>
       </a-col>
       <a-col :lg="12" :md="24">
-        <a-form :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form :form="userGroupForm" :label-col="labelCol" :wrapper-col="wrapperCol">
+          <a-form-item label="ID" v-show="false">
+            <a-input v-decorator="['id']" />
+          </a-form-item>
           <a-form-item label="上级组">
             <a-tree-select
               allowClear
-              v-model="userGroupForm.parentId"
+              v-decorator="['parentId']"
               style="width: 100%"
               :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
               :tree-data="userGroupTreeData"
@@ -32,13 +35,16 @@
             </a-tree-select>
           </a-form-item>
           <a-form-item label="组名称">
-            <a-input v-model="userGroupForm.groupName" placeholder="例如：默认用户组" />
+            <a-input
+              v-decorator="['groupName', { rules: [{ required: true, message: '分组名称不能为空' }] }]"
+              placeholder="例如：默认用户组"
+            />
           </a-form-item>
           <a-form-item label="排序">
             <a-tooltip :trigger="['focus']" placement="topLeft" overlay-class-name="numeric-input">
               <template slot="title"> 请输入整数数字 </template>
               <a-input
-                v-model.number="userGroupForm.sortIndex"
+                v-decorator="['sortIndex', { rules: [{ required: false, message: '请输入整数' }] }]"
                 type="number"
                 placeholder="只能输入数字"
                 :max-length="25"
@@ -58,6 +64,7 @@
 <script>
 import groupApi from '@/api/group'
 import { baseMixin } from '@/store/app-mixin'
+import pick from 'lodash.pick'
 
 export default {
   name: 'TreeList',
@@ -65,7 +72,7 @@ export default {
   data () {
     return {
       treeDataLoading: false,
-      userGroupForm: {},
+      userGroupForm: this.$form.createForm(this, { name: 'userGroupForm' }),
       groupFormButtonWrapperCol: { span: 14, offset: 4 },
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
@@ -75,23 +82,28 @@ export default {
       autoExpandParent: false,
       checkedGroupKeys: [],
       selectedKeys: [],
-      userGroupTreeData: []
+      userGroupTreeData: [],
     }
   },
   created () {
     this.listUserGroupTree()
   },
-  computed: {
-  },
+  computed: {},
   methods: {
     listUserGroupTree () {
       this.treeDataLoading = true
-      groupApi.list().then(res => {
-        this.userGroupTreeData = res.data
-      }).catch(err => {
-        this.userGroupTreeData = []
-        this.$message.error(`查询出错:${err}`)
-      }).finally(() => { this.treeDataLoading = false })
+      groupApi
+        .list()
+        .then((res) => {
+          this.userGroupTreeData = res.data
+        })
+        .catch((err) => {
+          this.userGroupTreeData = []
+          this.$message.error(`查询出错:${err}`)
+        })
+        .finally(() => {
+          this.treeDataLoading = false
+        })
     },
     onTreeGroupExpand (expandedKeys) {
       console.log('onExpand', expandedKeys)
@@ -109,10 +121,10 @@ export default {
       this.selectedKeys = selectedKeys
       var id = selectedKeys[0]
       if (id) {
-        groupApi.getById(id).then(res => {
-          this.userGroupForm = res.data
+        groupApi.getById(id).then((res) => {
+          this.userGroupForm.setFieldsValue(pick(res.data, 'id', 'parentId', 'groupName', 'sortIndex'))
           if (res.data.parentId === 0) {
-            this.userGroupForm.parentId = null
+            this.userGroupForm.setFieldsValue({ parentId: null })
           }
         })
       }
@@ -124,19 +136,21 @@ export default {
       }
     },
     handleSaveOrUpdate () {
-      if (this.userGroupForm) {
-        this.$message.warning('必填参数为空')
-        return
-      }
-      groupApi.createOrUpdate(this.userGroupForm).then(res => {
-        this.$message.success('保存成功')
-        this.listUserGroupTree()
+      this.userGroupForm.validateFields((err, values) => {
+        if (err) {
+          return
+        }
+        groupApi.createOrUpdate(values).then((res) => {
+          this.$message.success('保存成功')
+          this.userGroupForm.resetFields()
+          this.listUserGroupTree()
+        })
       })
     },
     handleResetGroupForm () {
-      this.userGroupForm = {}
-    }
-  }
+      this.userGroupForm.resetFields()
+    },
+  },
 }
 </script>
 
