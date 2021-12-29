@@ -216,6 +216,7 @@ export default {
         })
     },
     handleCancel () {
+      this.form.resetFields()
       this.close()
     },
   },
