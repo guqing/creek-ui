@@ -17,13 +17,15 @@ import store from '@/store'
 const action = Vue.directive('action', {
   inserted: function (el, binding, vnode) {
     const actionName = binding.arg
-    const permissions = store.getters.userInfo.permissions
+    const permissions = store.getters.userInfo.scopes
+    console.log(permissions)
     const elVal = vnode.context.$route.meta.permission
     var action = elVal + ':' + actionName
-    if (!permissions.includes(action)) {
-      el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
-    }
-  }
+    console.log(action)
+    // if (!permissions.includes(action)) {
+    //   el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
+    // }
+  },
 })
 
 export default action

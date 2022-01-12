@@ -1,28 +1,28 @@
 import { axios } from '@/utils/request'
 
-const groupApi = {}
+const groupsApi = {}
 
-groupApi.list = function (parameter) {
+groupsApi.list = function (parameter) {
   return axios({
-    url: '/group/list',
+    url: '/groups/list',
     method: 'get',
-    params: parameter
+    params: parameter,
   })
 }
 
-groupApi.getById = function (parameter) {
+groupsApi.getById = function (parameter) {
   return axios({
-    url: `/group/${parameter}`,
-    method: 'get'
+    url: `/groups/${parameter}`,
+    method: 'get',
   })
 }
 
-groupApi.createOrUpdate = function (parameter) {
+groupsApi.createOrUpdate = function (parameter) {
   return axios({
-    url: `/group/save`,
+    url: `/groups/save`,
     method: 'post',
-    data: parameter
+    data: parameter,
   })
 }
 
-export default groupApi
+export default groupsApi

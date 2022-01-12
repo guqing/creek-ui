@@ -34,7 +34,7 @@
     </div>
 
     <div class="table-operator">
-      <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
+      <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
         </a-menu>
@@ -52,18 +52,18 @@
         show: true,
         clear: () => {
           this.selectedRowKeys = []
-        }
+        },
       }"
       :rowSelection="{
         selectedRowKeys: this.selectedRowKeys,
-        onChange: this.onSelectChange
+        onChange: this.onSelectChange,
       }"
     >
       <span slot="action" slot-scope="text, record">
         <template>
           <a href="javascript:;" @click="$refs.modal.detail(record)">详情</a>
-          <a-divider type="vertical" v-action:delete />
-          <a @click="handleDelete(record)" v-action:delete>删除</a>
+          <a-divider type="vertical" />
+          <a @click="handleDelete(record)">删除</a>
         </template>
       </span>
     </s-table>
@@ -81,7 +81,7 @@ export default {
   name: 'ActionLog',
   components: {
     STable,
-    ActionModal
+    ActionModal,
   },
   data () {
     return {
@@ -94,22 +94,22 @@ export default {
       columns: [
         {
           title: '操作人',
-          dataIndex: 'username'
+          dataIndex: 'username',
         },
         {
           title: '内容',
           dataIndex: 'operation',
-          ellipsis: true
+          ellipsis: true,
         },
         {
           title: '方法',
           dataIndex: 'method',
-          ellipsis: true
+          ellipsis: true,
         },
         {
           title: '入参',
           dataIndex: 'params',
-          ellipsis: true
+          ellipsis: true,
         },
         {
           title: '执行耗时',
@@ -117,56 +117,59 @@ export default {
           sorter: true,
           customRender: (text) => {
             return <a-tag color="green">{text} ms</a-tag>
-          }
+          },
         },
         {
           title: 'IP',
-          dataIndex: 'ip'
+          dataIndex: 'ip',
         },
         {
           title: '位置',
-          dataIndex: 'location'
+          dataIndex: 'location',
         },
         {
           title: '操作时间',
           dataIndex: 'createTime',
-          sorter: true
+          sorter: true,
         },
         {
           title: '操作',
           dataIndex: 'action',
           width: '150px',
-          scopedSlots: { customRender: 'action' }
-        }
+          scopedSlots: { customRender: 'action' },
+        },
       ],
       // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
+      loadData: (parameter) => {
         const queryRequest = {}
         queryRequest.current = parameter.pageNo
         queryRequest.pageSize = parameter.pageSize
         Object.assign(queryRequest, this.queryParam)
         this.$log.debug('loadData.parameter', queryRequest)
-        return actionLogApi.list(queryRequest).then(res => {
-          return {
-            pageSize: res.data.pageSize,
-            pageNo: res.data.current,
-            totalCount: res.data.total,
-            totalPage: res.data.pages,
-            data: res.data.list
-          }
-        }).catch(err => {
-          this.$message.error(`查询出错:${err}`)
-          return {
-            pageSize: 0,
-            pageNo: 1,
-            totalCount: 0,
-            totalPage: 0,
-            data: []
-          }
-        })
+        return actionLogApi
+          .list(queryRequest)
+          .then((res) => {
+            return {
+              pageSize: res.data.pageSize,
+              pageNo: res.data.current,
+              totalCount: res.data.total,
+              totalPage: res.data.pages,
+              data: res.data.list,
+            }
+          })
+          .catch((err) => {
+            this.$message.error(`查询出错:${err}`)
+            return {
+              pageSize: 0,
+              pageNo: 1,
+              totalCount: 0,
+              totalPage: 0,
+              data: [],
+            }
+          })
       },
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
     }
   },
   methods: {
@@ -177,9 +180,7 @@ export default {
     handleDelete (record) {
       this.$log.debug('删除记录:', record)
     },
-    handleOk () {
-
-    },
+    handleOk () {},
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
@@ -190,10 +191,10 @@ export default {
     resetSearchForm () {
       this.queryParam = {
         createFrom: null,
-        createTo: null
+        createTo: null,
       }
       this.$refs.table.refresh()
-    }
-  }
+    },
+  },
 }
 </script>

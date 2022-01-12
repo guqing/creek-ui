@@ -52,7 +52,7 @@
             </a-tooltip>
           </a-form-item>
           <a-form-item :wrapper-col="groupFormButtonWrapperCol">
-            <a-button type="primary" v-limitclick="handleSaveOrUpdate" v-action:save> 保存 </a-button>
+            <a-button type="primary" v-limitclick="handleSaveOrUpdate"> 保存 </a-button>
             <a-button :style="{ marginLeft: '8px' }" @click="handleResetGroupForm"> 重置 </a-button>
           </a-form-item>
         </a-form>

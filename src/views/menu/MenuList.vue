@@ -72,9 +72,7 @@
             </a-form-model-item>
           </a-col>
           <a-form-model-item :wrapper-col="menuFormButtonWrapperCol">
-            <a-button type="primary" @click="handleSaveOrUpdateMenu" :loading="loadingState.save" v-action:save>
-              保存
-            </a-button>
+            <a-button type="primary" @click="handleSaveOrUpdateMenu" :loading="loadingState.save">保存</a-button>
             <a-button :style="{ marginLeft: '8px' }" @click="handleResetMenuForm" :loading="loadingState.reset">
               重置
             </a-button>
@@ -137,33 +135,29 @@ export default {
   name: 'TreeList',
   mixins: [baseMixin],
   components: {
-    IconSelector
+    IconSelector,
   },
   data () {
     return {
       iconSelect: {
         visible: false,
-        selected: ''
+        selected: '',
       },
       iconSelectorVisible: false,
       loadingState: {
         save: false,
-        reset: false
+        reset: false,
       },
       menuForm: {},
       treeDataLoading: false,
       rules: {
         title: [
           { required: true, message: '请输入菜单或按钮的名称', trigger: 'blur' },
-          { max: 150, message: '长度不能超过150字符', trigger: 'blur' }
+          { max: 150, message: '长度不能超过150字符', trigger: 'blur' },
         ],
-        path: [
-          { validator: validatePath, trigger: 'change' }
-        ],
-        name: [
-          { validator: validateComponentName, trigger: 'change' }
-        ],
-        component: [{ validator: validateComponentPath, trigger: 'change' }]
+        path: [{ validator: validatePath, trigger: 'change' }],
+        name: [{ validator: validateComponentName, trigger: 'change' }],
+        component: [{ validator: validateComponentPath, trigger: 'change' }],
       },
       moreFormItem: false,
       menuFormButtonWrapperCol: { span: 14, offset: 4 },
@@ -175,7 +169,7 @@ export default {
       autoExpandParent: false,
       checkedMenuKeys: [],
       selectedKeys: [],
-      menuTreeData: []
+      menuTreeData: [],
     }
   },
   created () {
@@ -184,7 +178,7 @@ export default {
   computed: {
     showMenuFormItem () {
       return (this.menuForm.type || '0') === '0'
-    }
+    },
   },
   methods: {
     handleChangeIcon (type) {
@@ -205,12 +199,18 @@ export default {
     },
     listTreeMenu () {
       this.treeDataLoading = true
-      menuApi.listTreeMenu().then(res => {
-        this.menuTreeData = res.data
-      }).catch(err => {
-        this.menuTreeData = []
-        this.$message.error(`查询出错:${err}`)
-      }).finally(() => { this.treeDataLoading = false })
+      menuApi
+        .listTreeMenu()
+        .then((res) => {
+          this.menuTreeData = res.data
+        })
+        .catch((err) => {
+          this.menuTreeData = []
+          this.$message.error(`查询出错:${err}`)
+        })
+        .finally(() => {
+          this.treeDataLoading = false
+        })
     },
     onTreeMenuExpand (expandedKeys) {
       console.log('onExpand', expandedKeys)
@@ -228,7 +228,7 @@ export default {
       this.selectedKeys = selectedKeys
       var id = selectedKeys[0]
       if (id) {
-        menuApi.getById(id).then(res => {
+        menuApi.getById(id).then((res) => {
           this.menuForm = res.data
           this.handleMenuFormValueConvert()
         })
@@ -257,19 +257,22 @@ export default {
     },
     handleSaveOrUpdateMenu () {
       this.loadingState.save = true
-      this.$refs['menuForm'].validate(valid => {
+      this.$refs['menuForm'].validate((valid) => {
         if (valid) {
           this.menuForm.type = '0'
-          menuApi.saveOrUpdate(this.menuForm).then(res => {
-            this.$message.success('保存成功')
-            this.listTreeMenu()
-            storage.remove(ROUTER_MAP)
-            this.handleResetMenuForm()
-          }).finally(() => {
-            setTimeout(() => {
-              this.loadingState.save = false
-            }, 1500)
-          })
+          menuApi
+            .saveOrUpdate(this.menuForm)
+            .then((res) => {
+              this.$message.success('保存成功')
+              this.listTreeMenu()
+              storage.remove(ROUTER_MAP)
+              this.handleResetMenuForm()
+            })
+            .finally(() => {
+              setTimeout(() => {
+                this.loadingState.save = false
+              }, 1500)
+            })
         } else {
           setTimeout(() => {
             this.loadingState.save = false
@@ -286,8 +289,8 @@ export default {
       setTimeout(() => {
         this.loadingState.reset = false
       }, 1500)
-    }
-  }
+    },
+  },
 }
 </script>
 

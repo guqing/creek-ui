@@ -1,42 +1,42 @@
 import { axios } from '@/utils/request'
 
-const menuApi = {}
+const menusApi = {}
 
-menuApi.listRouterMap = function () {
+menusApi.listRouterMap = function () {
   return axios({
-    url: '/menu/router',
-    method: 'get'
-  })
-}
-
-menuApi.listTreeMenu = function (parameter) {
-  return axios({
-    url: '/menu',
+    url: '/menus/router',
     method: 'get',
-    params: parameter
   })
 }
 
-menuApi.getById = function (parameter) {
+menusApi.listTreemenus = function (parameter) {
   return axios({
-    url: `/menu/${parameter}`,
-    method: 'get'
+    url: '/menus',
+    method: 'get',
+    params: parameter,
   })
 }
-menuApi.saveOrUpdate = function (parameter) {
+
+menusApi.getById = function (parameter) {
   return axios({
-    url: `/menu/save`,
+    url: `/menus/${parameter}`,
+    method: 'get',
+  })
+}
+menusApi.saveOrUpdate = function (parameter) {
+  return axios({
+    url: `/menus/save`,
     method: 'post',
-    data: parameter
+    data: parameter,
   })
 }
 
-menuApi.deleteByIds = function (parameter) {
+menusApi.deleteByIds = function (parameter) {
   return axios({
-    url: `/menu`,
+    url: `/menus`,
     method: 'delete',
-    data: parameter
+    data: parameter,
   })
 }
 
-export default menuApi
+export default menusApi
