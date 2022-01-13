@@ -2456,10 +2456,10 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
-ant-design-vue@1.6.3:
-  version "1.6.3"
-  resolved "https://registry.yarnpkg.com/ant-design-vue/-/ant-design-vue-1.6.3.tgz#48a16dfc2acd73cbd748a59a19bb6cedb45bfbea"
-  integrity sha512-Zt0z0SXzHCgow0chv4OA8lONxVOzXf7iLmZxdVHlsS3IaPn5n8QNPCzBUh3z0IXBdaDPiX9tjELQCXf9vdXdlw==
+ant-design-vue@1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/ant-design-vue/-/ant-design-vue-1.6.5.tgz#82f69846d921c220d04bb9ef9a6c40605e146e6c"
+  integrity sha512-FzLrK+JuJUq+g4vd+UjFFi13ZdSsb11EZFapisFXilJxpc1LxqyunZu5AP4nr9vFLs3J4UX2A6q+Rp/Fi6JrLg==
   dependencies:
     "@ant-design/icons" "^2.1.1"
     "@ant-design/icons-vue" "^2.0.0"

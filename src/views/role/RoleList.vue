@@ -1,5 +1,6 @@
 <template>
   <a-card :bordered="false">
+    <api-scope />
     <a-row :gutter="8" type="flex" justify="center">
       <a-col :lg="8" :md="24" :order="isMobile ? 1 : 0">
         <a-form-model :model="roleForm" :label-col="labelCol" :wrapper-col="wrapperCol">
@@ -59,7 +60,7 @@
               </a-col>
             </a-row>
           </a-form>
-          <a-dropdown v-if="selectedRoleKeys.length > 0" style="margin-top: 15px;">
+          <a-dropdown v-if="selectedRoleKeys.length > 0" style="margin-top: 15px">
             <a-menu slot="overlay">
               <a-menu-item key="1" @click="handleBatchDeleteRole"><a-icon type="delete" />删除</a-menu-item>
             </a-menu>
@@ -105,19 +106,21 @@ import { STable } from '@/components'
 import menuApi from '@/api/menu'
 import roleApi from '@/api/role'
 import { baseMixin } from '@/store/app-mixin'
+import ApiScope from './modules/ApiScope.vue'
 
 export default {
   name: 'TreeList',
   mixins: [baseMixin],
   components: {
-    STable
+    STable,
+    ApiScope,
   },
   data () {
     return {
       loadingState: {
         save: false,
         query: false,
-        reset: false
+        reset: false,
       },
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
@@ -129,47 +132,50 @@ export default {
         {
           title: '角色名称',
           dataIndex: 'roleName',
-          needTotal: true
+          needTotal: true,
         },
         {
           title: '角色描述',
-          dataIndex: 'remark'
+          dataIndex: 'remark',
         },
         {
           title: '创建时间',
           dataIndex: 'createTime',
-          sorter: true
+          sorter: true,
         },
         {
           title: '操作',
           dataIndex: 'action',
           width: '150px',
-          scopedSlots: { customRender: 'action' }
-        }
+          scopedSlots: { customRender: 'action' },
+        },
       ],
       // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
+      loadData: (parameter) => {
         const requestParameters = Object.assign({}, this.queryParam)
         requestParameters.current = parameter.pageNo
         requestParameters.pageSize = parameter.pageSize
-        return roleApi.listRole(requestParameters).then(res => {
-          return {
-            pageSize: res.data.pageSize,
-            pageNo: res.data.current,
-            totalCount: res.data.total,
-            totalPage: res.data.pages,
-            data: res.data.list
-          }
-        }).catch(err => {
-          this.$message.error(`查询出错:${err}`)
-          return {
-            pageSize: 0,
-            pageNo: 1,
-            totalCount: 0,
-            totalPage: 0,
-            data: []
-          }
-        })
+        return roleApi
+          .listRole(requestParameters)
+          .then((res) => {
+            return {
+              pageSize: res.data.pageSize,
+              pageNo: res.data.current,
+              totalCount: res.data.total,
+              totalPage: res.data.pages,
+              data: res.data.list,
+            }
+          })
+          .catch((err) => {
+            this.$message.error(`查询出错:${err}`)
+            return {
+              pageSize: 0,
+              pageNo: 1,
+              totalCount: 0,
+              totalPage: 0,
+              data: [],
+            }
+          })
       },
       expandedMenuKeys: [],
       autoExpandParent: false,
@@ -179,7 +185,7 @@ export default {
       treeParentIds: [],
       editExpandedMenuKeys: [],
       selectedRoleKeys: [],
-      selectedRoles: []
+      selectedRoles: [],
     }
   },
   created () {
@@ -189,9 +195,9 @@ export default {
     roleFormButtonWrapperCol () {
       return {
         span: this.wrapperCol.span,
-        offset: this.labelCol.span
+        offset: this.labelCol.span,
       }
-    }
+    },
   },
   methods: {
     handleRoleEdit (role) {
@@ -199,7 +205,7 @@ export default {
       this.editExpandedMenuKeys = []
 
       var roleId = role.id
-      roleApi.getById(roleId).then(res => {
+      roleApi.getById(roleId).then((res) => {
         var menuIdArray = res.data.menuIds || []
         var menuIdStringArray = menuIdArray.map(String)
         var childrenMenuKeys = this.handleTreeChildrenIdsSelector(menuIdStringArray)
@@ -210,7 +216,7 @@ export default {
       })
     },
     listTreeMenu () {
-      menuApi.listTreeMenu().then(res => {
+      menuApi.listTreeMenu().then((res) => {
         this.menuTreeData = res.data
       })
     },
@@ -232,7 +238,7 @@ export default {
     },
     handleClick (e) {
       this.queryParam = {
-        key: e.key
+        key: e.key,
       }
       this.$refs.table.refresh(true)
     },
@@ -244,11 +250,16 @@ export default {
       this.loadingState.save = true
       var menuIds = this.handleRelatedParentRoleMenuKeys()
       this.roleForm.menuIds = menuIds
-      roleApi.createOrUpdate(this.roleForm).then(res => {
-        this.$message.success('保存成功')
-        this.handleResetRoleForm()
-        this.$refs.table.refresh()
-      }).finally(() => { this.loadingState.save = false })
+      roleApi
+        .createOrUpdate(this.roleForm)
+        .then((res) => {
+          this.$message.success('保存成功')
+          this.handleResetRoleForm()
+          this.$refs.table.refresh()
+        })
+        .finally(() => {
+          this.loadingState.save = false
+        })
     },
     handleRelatedParentRoleMenuKeys () {
       var menuIds = []
@@ -328,15 +339,15 @@ export default {
         cancelText: '取消',
         onOk () {
           that.$log.debug('批量删除角色', that.selectedRoleKeys)
-          roleApi.deleteByIds(that.selectedRoleKeys).then(res => {
+          roleApi.deleteByIds(that.selectedRoleKeys).then((res) => {
             that.$message.success('删除成功')
           })
         },
         onCancel () {
           that.$log.info('Cancel')
-        }
+        },
       })
-    }
-  }
+    },
+  },
 }
 </script>

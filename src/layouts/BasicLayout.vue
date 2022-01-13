@@ -37,7 +37,7 @@ export default {
   components: {
     SettingDrawer,
     RightContent,
-    GlobalFooter
+    GlobalFooter,
   },
   data () {
     return {
@@ -59,24 +59,26 @@ export default {
         colorWeak: false,
 
         hideHintAlert: false,
-        hideCopyButton: false
+        hideCopyButton: false,
       },
       // 媒体查询
       query: {},
 
       // 是否手机模式
-      isMobile: false
+      isMobile: false,
     }
   },
   computed: {
     ...mapState({
       // 动态主路由
-      mainMenu: state => state.permission.addRouters
-    })
+      mainMenu: (state) => state.permission.routers,
+    }),
   },
   created () {
-    const routes = this.mainMenu.find(item => item.path === '/')
+    console.log(this.mainMenu)
+    const routes = this.mainMenu.find((item) => item.path === '/')
     this.menus = (routes && routes.children) || []
+    console.log(this.menus)
     // 处理侧栏收起状态
     this.$watch('collapsed', () => {
       this.$store.commit(SIDEBAR_TYPE, this.collapsed)
@@ -133,8 +135,8 @@ export default {
     },
     logoRender () {
       return <LogoSvg />
-    }
-  }
+    },
+  },
 }
 </script>
 

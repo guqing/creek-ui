@@ -1,5 +1,146 @@
 // eslint-disable-next-line
-import { UserLayout } from '@/layouts'
+import { UserLayout, BasicLayout, RouteView } from '@/layouts'
+
+export const asyncRouterMap = [
+  {
+    key: 'index',
+    name: 'index',
+    path: '/',
+    component: BasicLayout,
+    redirect: '/dashboard',
+    meta: {
+      title: 'menu.home',
+      icon: 'dashboard',
+    },
+    children: [
+      {
+        name: 'dashboard',
+        path: '/dashboard',
+        redirect: '/dashboard/workplace',
+        component: RouteView,
+        meta: { title: '仪表盘', keepAlive: true, icon: 'dashboard' },
+        children: [
+          {
+            name: 'Analysis',
+            title: '分析页',
+            path: '/dashboard/analysis',
+            component: () => import('@/views/dashboard/Analysis'),
+            meta: { title: '分析页', keepAlive: true },
+          },
+          {
+            name: 'Workplace',
+            title: '工作台',
+            path: '/dashboard/workplace',
+            component: () => import('@/views/dashboard/Workplace'),
+            meta: { title: '工作台', keepAlive: true },
+          },
+        ],
+      },
+      {
+        name: 'form',
+        path: '/form',
+        redirect: '/form/base-form',
+        component: RouteView,
+        meta: { title: '表单页', keepAlive: true, icon: 'form' },
+        children: [
+          {
+            name: 'BaseForm',
+            title: '基础表单',
+            path: '/form/base-form',
+            component: () => import('@/views/form/basicForm'),
+            meta: { title: '基础表单', keepAlive: true },
+          },
+          {
+            name: 'StepForm',
+            path: '/form/step-form',
+            component: () => import('@/views/form/stepForm/StepForm'),
+            meta: { title: '分步表单', keepAlive: true },
+          },
+          {
+            name: 'AdvanceForm',
+            title: '高级表单',
+            path: '/form/advanced-form',
+            component: () => import('@/views/form/advancedForm/AdvancedForm'),
+            meta: { title: '高级表单', keepAlive: true },
+          },
+        ],
+      },
+      {
+        name: 'RAM',
+        path: '/ram',
+        redirect: '/ram/user',
+        component: RouteView,
+        meta: { title: '系统管理', keepAlive: true, icon: 'safety-certificate' },
+        children: [
+          {
+            name: 'User',
+            path: '/ram/user',
+            component: () => import('@/views/user/UserList'),
+            meta: { title: '用户管理', keepAlive: true },
+          },
+          {
+            name: 'Role',
+            path: '/ram/role',
+            component: () => import('@/views/role/RoleList'),
+            meta: { title: '角色管理', keepAlive: true },
+          },
+          {
+            name: 'Menu',
+            path: '/ram/menu',
+            component: () => import('@/views/menu/MenuList'),
+            meta: { title: '菜单管理', keepAlive: true },
+          },
+          {
+            name: 'UserGroup',
+            path: '/ram/user/group',
+            component: () => import('@/views/group/UserGroupList'),
+            meta: { title: '用户组管理', keepAlive: true },
+          },
+        ],
+      },
+      {
+        name: 'Monitor',
+        path: '/monitor',
+        redirect: '/monitor/log/action',
+        component: RouteView,
+        meta: { title: '监控日志', keepAlive: true, icon: 'fund' },
+        children: [
+          {
+            name: 'ActionLog',
+            title: '系统日志',
+            path: '/monitor/log/action',
+            component: () => import('@/views/monitor/ActionLog'),
+            meta: { title: '系统日志', keepAlive: true },
+          },
+          {
+            name: 'LoginLog',
+            title: '登录日志',
+            path: '/monitor/log/login',
+            component: () => import('@/views/monitor/LoginLog'),
+            meta: { title: '登录日志', keepAlive: true },
+          },
+        ],
+      },
+      {
+        name: 'Account',
+        path: '/account',
+        redirect: '/account/center',
+        component: RouteView,
+        meta: { title: '个人页', keepAlive: true, icon: 'user' },
+        children: [
+          {
+            name: 'AccountCenter',
+            path: '/account/center',
+            redirect: null,
+            component: () => import('@/views/account/center/Index'),
+            meta: { title: '个人中心', keepAlive: true },
+          },
+        ],
+      },
+    ],
+  },
+]
+
 /**
  * 基础路由
  * @type { *[] }
@@ -14,29 +155,28 @@ export const constantRouterMap = [
       {
         path: 'login',
         name: 'login',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
+        component: () => import('@/views/user/Login'),
       },
       {
         path: 'register',
         name: 'register',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Register')
+        component: () => import('@/views/user/Register'),
       },
       {
         path: 'register-result',
         name: 'registerResult',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/RegisterResult')
+        component: () => import('@/views/user/RegisterResult'),
       },
       {
         path: 'recover',
         name: 'recover',
-        component: undefined
-      }
-    ]
+        component: undefined,
+      },
+    ],
   },
 
   {
     path: '/404',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
-  }
-
+    component: () => import('@/views/exception/404'),
+  },
 ]

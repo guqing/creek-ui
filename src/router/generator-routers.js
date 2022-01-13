@@ -8,23 +8,25 @@ const constantRouterComponents = {
   BlankLayout: BlankLayout,
   RouteView: RouteView,
   PageView: PageView,
-  '403': () => import(/* webpackChunkName: "error" */ '@/views/exception/403'),
-  '404': () => import(/* webpackChunkName: "error" */ '@/views/exception/404'),
-  '500': () => import(/* webpackChunkName: "error" */ '@/views/exception/500'),
+  403: () => import(/* webpackChunkName: "error" */ '@/views/exception/403'),
+  404: () => import(/* webpackChunkName: "error" */ '@/views/exception/404'),
+  500: () => import(/* webpackChunkName: "error" */ '@/views/exception/500'),
 
   // 你需要动态引入的页面组件
-  'Workplace': () => import('@/views/dashboard/Workplace'),
-  'Analysis': () => import('@/views/dashboard/Analysis'),
+  Workplace: () => import('@/views/dashboard/Workplace'),
+  Analysis: () => import('@/views/dashboard/Analysis'),
 
   // exception
-  'Exception403': () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
-  'Exception404': () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
-  'Exception500': () => import(/* webpackChunkName: "fail" */ '@/views/exception/500')
+  Exception403: () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
+  Exception404: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
+  Exception500: () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
 }
 
 // 前端未找到页面路由（固定不用改）
 const notFoundRouter = {
-  path: '*', redirect: '/500', hidden: true
+  path: '*',
+  redirect: '/500',
+  hidden: true,
 }
 
 // 根级菜单
@@ -35,9 +37,9 @@ const rootRouter = {
   component: 'BasicLayout',
   redirect: '/dashboard',
   meta: {
-    title: 'menu.home'
+    title: 'menu.home',
   },
-  children: []
+  children: [],
 }
 
 /**
@@ -46,7 +48,7 @@ const rootRouter = {
  * @returns {Promise<Router>}
  */
 export const generatorDynamicRouter = (result) => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const menuNav = []
     const childrenNav = []
     // 后端数据, 根级树数组,  根级 PID
@@ -56,6 +58,8 @@ export const generatorDynamicRouter = (result) => {
     const routers = generator(menuNav)
     routers.push(notFoundRouter)
     resolve(routers)
+
+    console.log(JSON.stringify(rootRouter))
   })
 }
 
@@ -67,7 +71,7 @@ export const generatorDynamicRouter = (result) => {
  * @returns {*}
  */
 export const generator = (routerMap, parent) => {
-  return routerMap.map(item => {
+  return routerMap.map((item) => {
     const { title, hidden, hideChildren, hiddenHeaderContent, target, icon } = item || {}
 
     var permission = item.name
@@ -76,7 +80,7 @@ export const generator = (routerMap, parent) => {
     }
 
     let routerTarget = target
-    const path = item.path || `${parent && parent.path || ''}/${item.key}`
+    const path = item.path || `${(parent && parent.path) || ''}/${item.key}`
     if (path.startsWith('http://') || path.startsWith('https://')) {
       routerTarget = '_blank'
     }
@@ -89,15 +93,15 @@ export const generator = (routerMap, parent) => {
       // 该路由对应页面的 组件 :方案1
       // component: constantRouterComponents[item.component || item.key],
       // 该路由对应页面的 组件 :方案2 (动态加载)
-      component: (constantRouterComponents[item.component || item.key]) || (() => import(`@/views/${item.component}`)),
+      component: constantRouterComponents[item.component || item.key] || (() => import(`@/views/${item.component}`)),
       // meta: 页面标题, 菜单图标, 页面权限(供指令权限用，可去掉)
       meta: {
         title: title,
         icon: icon || undefined,
         hiddenHeaderContent: hiddenHeaderContent || false,
         target: routerTarget,
-        permission: permission
-      }
+        permission: permission,
+      },
     }
     // 是否设置了隐藏菜单
     if (hidden) {
@@ -136,7 +140,7 @@ const listToTree = (list, tree, parentId) => {
       const child = {
         ...item,
         key: item.key || item.name,
-        children: []
+        children: [],
       }
       // 迭代 list， 找到当前菜单相符合的所有子菜单
       listToTree(list, child.children, item.id)
