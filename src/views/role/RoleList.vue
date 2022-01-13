@@ -103,7 +103,6 @@
 
 <script>
 import { STable } from '@/components'
-import menuApi from '@/api/menu'
 import roleApi from '@/api/role'
 import { baseMixin } from '@/store/app-mixin'
 import ApiScope from './modules/ApiScope.vue'
@@ -188,9 +187,7 @@ export default {
       selectedRoles: [],
     }
   },
-  created () {
-    this.listTreeMenu()
-  },
+  created () {},
   computed: {
     roleFormButtonWrapperCol () {
       return {
@@ -213,11 +210,6 @@ export default {
         this.expandedMenuKeys = this.editExpandedMenuKeys
         // 回显示到表单
         Object.assign(this.roleForm, role)
-      })
-    },
-    listTreeMenu () {
-      menuApi.listTreeMenu().then((res) => {
-        this.menuTreeData = res.data
       })
     },
     onTreeMenuExpand (expandedKeys) {

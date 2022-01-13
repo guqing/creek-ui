@@ -85,16 +85,10 @@ export const asyncRouterMap = [
             meta: { title: '角色管理', keepAlive: true },
           },
           {
-            name: 'Menu',
-            path: '/ram/menu',
-            component: () => import('@/views/menu/MenuList'),
-            meta: { title: '菜单管理', keepAlive: true },
-          },
-          {
             name: 'UserGroup',
             path: '/ram/user/group',
             component: () => import('@/views/group/UserGroupList'),
-            meta: { title: '用户组管理', keepAlive: true },
+            meta: { title: '用户组', keepAlive: true },
           },
         ],
       },
