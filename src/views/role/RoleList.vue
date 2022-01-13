@@ -1,103 +1,66 @@
 <template>
   <a-card :bordered="false">
-    <api-scope />
-    <a-row :gutter="8" type="flex" justify="center">
-      <a-col :lg="8" :md="24" :order="isMobile ? 1 : 0">
-        <a-form-model :model="roleForm" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-model-item label="角色名称">
-            <a-input v-model="roleForm.roleName" />
-          </a-form-model-item>
-          <a-form-model-item label="角色描述">
-            <a-textarea
-              v-model="roleForm.remark"
-              placeholder="角色描述最大长度不能超过150字符"
-              :maxLength="150"
-              allowClear
-              :auto-size="{ minRows: 3, maxRows: 5 }"
-            />
-          </a-form-model-item>
-          <a-form-model-item label="角色权限">
-            <a-tree
-              v-model="checkedMenuKeys"
-              checkable
-              :expanded-keys="expandedMenuKeys"
-              :auto-expand-parent="autoExpandParent"
-              :selected-keys="selectedMenuKeys"
-              :tree-data="menuTreeData"
-              @expand="onTreeMenuExpand"
-              @select="onMenuSelect"
-              @check="onTreeMenuCheck"
-            />
-          </a-form-model-item>
-          <a-form-model-item :wrapper-col="roleFormButtonWrapperCol">
-            <a-button type="primary" @click="handleSaveOrUpdateRole" :loading="loadingState.save">保存</a-button>
-            <a-button :style="{ marginLeft: '15px' }" @click="handleResetRoleForm">重置</a-button>
-          </a-form-model-item>
-        </a-form-model>
-      </a-col>
+    <div class="table-operator">
+      <a-form layout="inline">
+        <a-row :gutter="15">
+          <a-col :md="8" :sm="24">
+            <a-form-item label="角色名称">
+              <a-input placeholder="角色名称" v-model="queryParam.roleName" />
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <a-form-item label="角色描述">
+              <a-input placeholder="角色描述" v-model="queryParam.remark" />
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <span class="table-page-search-submitButtons">
+              <a-button type="primary" @click="handleSearch" :loading="loadingState.query">查询</a-button>
+              <a-button style="margin-left: 8px" @click="handleResetSearchForm" :loading="loadingState.reset">
+                重置
+              </a-button>
+            </span>
+          </a-col>
+        </a-row>
+      </a-form>
+      <a-dropdown v-if="selectedRoleKeys.length > 0" style="margin-top: 15px">
+        <a-menu slot="overlay">
+          <a-menu-item key="1" @click="handleBatchDeleteRole"><a-icon type="delete" />删除</a-menu-item>
+        </a-menu>
+        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /> </a-button>
+      </a-dropdown>
+      <a-button type="primary" @click="() => (modalVisiable = true)">添加</a-button>
+    </div>
 
-      <a-col :lg="16" :md="24">
-        <div class="table-operator">
-          <a-form layout="inline">
-            <a-row :gutter="15">
-              <a-col :md="8" :sm="24">
-                <a-form-item label="角色名称">
-                  <a-input placeholder="角色名称" v-model="queryParam.roleName" />
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-form-item label="角色描述">
-                  <a-input placeholder="角色描述" v-model="queryParam.remark" />
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <span class="table-page-search-submitButtons">
-                  <a-button type="primary" @click="handleSearch" :loading="loadingState.query">查询</a-button>
-                  <a-button style="margin-left: 8px" @click="handleResetSearchForm" :loading="loadingState.reset">
-                    重置
-                  </a-button>
-                </span>
-              </a-col>
-            </a-row>
-          </a-form>
-          <a-dropdown v-if="selectedRoleKeys.length > 0" style="margin-top: 15px">
-            <a-menu slot="overlay">
-              <a-menu-item key="1" @click="handleBatchDeleteRole"><a-icon type="delete" />删除</a-menu-item>
-            </a-menu>
-            <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /> </a-button>
-          </a-dropdown>
-        </div>
-
-        <s-table
-          ref="table"
-          size="default"
-          rowKey="id"
-          :columns="columns"
-          :data="loadData"
-          showPagination="auto"
-          :alert="false"
-          :rowSelection="{ selectedRoleKeys: selectedRoleKeys, onChange: onRoleSelectChange }"
-        >
-          <span slot="action" slot-scope="text, record">
-            <template>
-              <a @click="handleRoleEdit(record)">编辑</a>
-              <a-divider type="vertical" />
-            </template>
-            <a-dropdown>
-              <a class="ant-dropdown-link"> 更多 <a-icon type="down" /> </a>
-              <a-menu slot="overlay">
-                <a-menu-item>
-                  <a href="javascript:;">详情</a>
-                </a-menu-item>
-                <a-menu-item>
-                  <a href="javascript:;">删除</a>
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
-          </span>
-        </s-table>
-      </a-col>
-    </a-row>
+    <s-table
+      ref="table"
+      size="default"
+      rowKey="id"
+      :columns="columns"
+      :data="loadData"
+      showPagination="auto"
+      :alert="false"
+      :rowSelection="{ selectedRoleKeys: selectedRoleKeys, onChange: onRoleSelectChange }"
+    >
+      <span slot="action" slot-scope="text, record">
+        <template>
+          <a @click="handleRoleEdit(record)">编辑</a>
+          <a-divider type="vertical" />
+        </template>
+        <a-dropdown>
+          <a class="ant-dropdown-link"> 更多 <a-icon type="down" /> </a>
+          <a-menu slot="overlay">
+            <a-menu-item>
+              <a href="javascript:;">详情</a>
+            </a-menu-item>
+            <a-menu-item>
+              <a href="javascript:;">删除</a>
+            </a-menu-item>
+          </a-menu>
+        </a-dropdown>
+      </span>
+    </s-table>
+    <RoleModal :visible="modalVisiable" @cancel="() => (modalVisiable = false)" />
   </a-card>
 </template>
 
@@ -106,6 +69,7 @@ import { STable } from '@/components'
 import roleApi from '@/api/role'
 import { baseMixin } from '@/store/app-mixin'
 import ApiScope from './modules/ApiScope.vue'
+import RoleModal from './modules/RoleModal.vue'
 
 export default {
   name: 'TreeList',
@@ -113,14 +77,16 @@ export default {
   components: {
     STable,
     ApiScope,
+    RoleModal,
   },
-  data () {
+  data() {
     return {
       loadingState: {
         save: false,
         query: false,
         reset: false,
       },
+      modalVisiable: false,
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
       roleForm: {},
@@ -187,9 +153,9 @@ export default {
       selectedRoles: [],
     }
   },
-  created () {},
+  created() {},
   computed: {
-    roleFormButtonWrapperCol () {
+    roleFormButtonWrapperCol() {
       return {
         span: this.wrapperCol.span,
         offset: this.labelCol.span,
@@ -197,7 +163,7 @@ export default {
     },
   },
   methods: {
-    handleRoleEdit (role) {
+    handleRoleEdit(role) {
       // 先清除要展开的keys
       this.editExpandedMenuKeys = []
 
@@ -212,33 +178,33 @@ export default {
         Object.assign(this.roleForm, role)
       })
     },
-    onTreeMenuExpand (expandedKeys) {
+    onTreeMenuExpand(expandedKeys) {
       // if not set autoExpandParent to false, if children expanded, parent can not collapse.
       // or, you can remove all expanded children keys.
       this.expandedMenuKeys = expandedKeys
       this.autoExpandParent = false
     },
-    onTreeMenuCheck (checkedMenuKeys) {
+    onTreeMenuCheck(checkedMenuKeys) {
       console.log('onCheck', checkedMenuKeys)
     },
-    onMenuSelect (selectedMenuKeys, info) {
+    onMenuSelect(selectedMenuKeys, info) {
       this.$log.debug('onMenuSelect', info.node.dataRef.key)
       var parentIds = this.findParentIdsById(this.menuTreeData, info.node.dataRef.key)
       this.$log.debug('on menu select find all parent ids:', parentIds)
 
       this.selectedMenuKeys = selectedMenuKeys
     },
-    handleClick (e) {
+    handleClick(e) {
       this.queryParam = {
         key: e.key,
       }
       this.$refs.table.refresh(true)
     },
-    onRoleSelectChange (selectedRoleKeys, selectedRoles) {
+    onRoleSelectChange(selectedRoleKeys, selectedRoles) {
       this.selectedRoleKeys = selectedRoleKeys
       this.selectedRoles = selectedRoles
     },
-    handleSaveOrUpdateRole () {
+    handleSaveOrUpdateRole() {
       this.loadingState.save = true
       var menuIds = this.handleRelatedParentRoleMenuKeys()
       this.roleForm.menuIds = menuIds
@@ -253,7 +219,7 @@ export default {
           this.loadingState.save = false
         })
     },
-    handleRelatedParentRoleMenuKeys () {
+    handleRelatedParentRoleMenuKeys() {
       var menuIds = []
       // 遍历每一个元素寻找其父元素添加到集合中，否则编辑后父元素的id不会自动关联导致父元元素无法显示
       for (var item of this.checkedMenuKeys) {
@@ -264,12 +230,12 @@ export default {
       var menuIdSet = new Set(menuIds)
       return Array.from(menuIdSet)
     },
-    handleResetRoleForm () {
+    handleResetRoleForm() {
       this.roleForm = {}
       this.checkedMenuKeys = []
       this.expandedMenuKeys = []
     },
-    handleTreeChildrenIdsSelector (menuIdArray) {
+    handleTreeChildrenIdsSelector(menuIdArray) {
       this.handleTreeParentIdsSelector(this.menuTreeData)
       var that = this
       return menuIdArray.filter(function (item) {
@@ -280,7 +246,7 @@ export default {
         }
       })
     },
-    handleTreeParentIdsSelector (treeList) {
+    handleTreeParentIdsSelector(treeList) {
       for (var i in treeList) {
         var data = treeList[i]
         if (data.hasChildren) {
@@ -289,7 +255,7 @@ export default {
         }
       }
     },
-    findParentIdsById (tree, id) {
+    findParentIdsById(tree, id) {
       var temp = []
       var forFn = function (arr, id) {
         for (var i = 0; i < arr.length; i++) {
@@ -306,14 +272,14 @@ export default {
       forFn(tree, id)
       return temp
     },
-    handleSearch () {
+    handleSearch() {
       this.loadingState.query = true
       this.$refs.table.refresh()
       setTimeout(() => {
         this.loadingState.query = false
       }, 1500)
     },
-    handleResetSearchForm () {
+    handleResetSearchForm() {
       this.loadingState.reset = true
       this.queryParam = {}
       this.$refs.table.refresh()
@@ -321,7 +287,7 @@ export default {
         this.loadingState.reset = false
       }, 1500)
     },
-    handleBatchDeleteRole () {
+    handleBatchDeleteRole() {
       const that = this
       this.$confirm({
         title: '警告',
@@ -329,13 +295,13 @@ export default {
         okText: '删除',
         okType: 'danger',
         cancelText: '取消',
-        onOk () {
+        onOk() {
           that.$log.debug('批量删除角色', that.selectedRoleKeys)
           roleApi.deleteByIds(that.selectedRoleKeys).then((res) => {
             that.$message.success('删除成功')
           })
         },
-        onCancel () {
+        onCancel() {
           that.$log.info('Cancel')
         },
       })
