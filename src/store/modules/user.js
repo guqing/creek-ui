@@ -1,6 +1,6 @@
 import storage from 'store'
 import { login, refreshToken, socailSignLogin, getInfo } from '@/api/login'
-import { ACCESS_TOKEN, ROUTER_MAP } from '@/store/mutation-types'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 
 const user = {
@@ -11,7 +11,6 @@ const user = {
     avatar: '',
     roles: [],
     info: {},
-    routerMap: []
   },
 
   mutations: {
@@ -31,9 +30,6 @@ const user = {
     SET_INFO: (state, info) => {
       state.info = info
     },
-    SET_ROUTERMAP: (state, routerMap) => {
-      state.routerMap = routerMap
-    }
   },
 
   actions: {
@@ -41,13 +37,13 @@ const user = {
     Login ({ commit }, userInfo) {
       return new Promise((resolve, reject) => {
         login(userInfo)
-          .then(response => {
+          .then((response) => {
             var token = getToken(response.data)
             storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
             commit('SET_TOKEN', token)
             resolve()
           })
-          .catch(error => {
+          .catch((error) => {
             reject(error)
           })
       })
@@ -55,13 +51,13 @@ const user = {
     RefreshToken ({ commit }, token) {
       return new Promise((resolve, reject) => {
         refreshToken(token)
-          .then(res => {
+          .then((res) => {
             var token = getToken(res.data)
             storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
             commit('SET_TOKEN', token)
             resolve()
           })
-          .catch(error => {
+          .catch((error) => {
             reject(error)
           })
       })
@@ -86,8 +82,8 @@ const user = {
       })
     },
     SocialSignLogin ({ commit }, data) {
-      return new Promise(resolve => {
-        socailSignLogin(data).then(res => {
+      return new Promise((resolve) => {
+        socailSignLogin(data).then((res) => {
           console.log('social sign login:', res)
           var token = getToken(res.data)
 
@@ -106,13 +102,13 @@ const user = {
     GetInfo ({ commit }) {
       return new Promise((resolve, reject) => {
         getInfo()
-          .then(response => {
+          .then((response) => {
             console.log('get user info:', response)
             const result = response.data
             setUserInfo(result, commit)
             resolve(result)
           })
-          .catch(error => {
+          .catch((error) => {
             reject(error)
           })
       })
@@ -120,16 +116,14 @@ const user = {
 
     // 登出
     Logout ({ commit }) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
-        commit('SET_ROUTERMAP', [])
         storage.remove(ACCESS_TOKEN)
-        storage.remove(ROUTER_MAP)
         resolve()
       })
-    }
-  }
+    },
+  },
 }
 
 function getToken (tokenInfo) {
@@ -140,7 +134,7 @@ function getToken (tokenInfo) {
     access_token: tokenInfo.access_token,
     refresh_token: tokenInfo.refresh_token,
     expireTime: expireTime,
-    token_type: tokenInfo.token_type
+    token_type: tokenInfo.token_type,
   }
 }
 
