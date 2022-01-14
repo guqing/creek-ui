@@ -15,7 +15,11 @@
           </a-col>
           <a-col :md="4" :sm="24">
             <a-form-item label="用户状态">
-              <a-select placeholder="请选择" default-value="0" v-model="queryParam.status">
+              <a-select
+                placeholder="请选择"
+                default-value="0"
+                v-model="queryParam.status"
+              >
                 <a-select-option value="0">正常</a-select-option>
                 <a-select-option value="1">禁用</a-select-option>
               </a-select>
@@ -23,14 +27,27 @@
           </a-col>
           <a-col :md="5" :sm="24">
             <a-form-item label="创建时间">
-              <a-range-picker style="width: 100%" @change="onDatePickerChange" />
+              <a-range-picker
+                style="width: 100%"
+                @change="onDatePickerChange"
+              />
             </a-form-item>
           </a-col>
 
           <a-col :md="4" :sm="24">
             <span class="table-page-search-submitButtons">
-              <a-button type="primary" @click="handleSearch" :loading="loadingState.query">查询</a-button>
-              <a-button style="margin-left: 8px" @click="handleSearchReset" :loading="loadingState.reset">
+              <a-button
+                type="primary"
+                @click="handleSearch"
+                :loading="loadingState.query"
+              >
+                查询
+              </a-button>
+              <a-button
+                style="margin-left: 8px"
+                @click="handleSearchReset"
+                :loading="loadingState.reset"
+              >
                 重置
               </a-button>
             </span>
@@ -40,14 +57,22 @@
     </div>
 
     <div class="table-operator">
-      <a-button type="primary" icon="plus" @click="$refs.modal.add()">新建</a-button>
+      <a-button type="primary" icon="plus" @click="$refs.modal.add()">
+        新建
+      </a-button>
       <a-dropdown v-show="tableOpsVisible">
         <a-menu slot="overlay">
-          <a-menu-item key="1" @click="handleDeleteInBatch"><a-icon type="delete" />删除</a-menu-item>
+          <a-menu-item key="1" @click="handleDeleteInBatch">
+            <a-icon type="delete" />删除
+          </a-menu-item>
           <!-- lock | unlock -->
-          <a-menu-item key="2" @click="handleLockUserInBatch()"><a-icon type="lock" />锁定</a-menu-item>
+          <a-menu-item key="2" @click="handleLockUserInBatch()">
+            <a-icon type="lock" />锁定
+          </a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /> </a-button>
+        <a-button style="margin-left: 8px">
+          批量操作 <a-icon type="down" />
+        </a-button>
       </a-dropdown>
     </div>
 
@@ -62,7 +87,11 @@
       :rowSelection="rowSelection"
     >
       <template slot="roleNames" slot-scope="text">
-        <a-tag :color="tagColor(index)" v-for="(roleName, index) in text" :key="index">
+        <a-tag
+          :color="tagColor(index)"
+          v-for="(roleName, index) in text"
+          :key="index"
+        >
           {{ roleName }}
         </a-tag>
       </template>
@@ -78,17 +107,22 @@
                 <a-menu-item>
                   <a href="javascript:;">详情</a>
                 </a-menu-item>
-                <a-menu-item v-if="record.status === 0" @click="handleLockUser([record.username])">
+                <a-menu-item
+                  v-if="record.status === 0 && !record.isInternal"
+                  @click="handleLockUser([record.username])"
+                >
                   <a href="javascript:;">锁定</a>
                 </a-menu-item>
-                <a-menu-item v-if="record.status === 1">
+                <a-menu-item v-if="record.status === 1 && !record.isInternal">
                   <a href="javascript:;" @click="handleLockUserInBatch">解锁</a>
                 </a-menu-item>
-                <a-menu-item>
-                  <a href="javascript:;" @click="del(record)">删除</a>
+                <a-menu-item v-if="!record.isInternal">
+                  <a href="javascript:;" @click="del(record)"> 删除 </a>
                 </a-menu-item>
                 <a-menu-item>
-                  <a href="javascript:;" @click="handleResetPassword(record)">重置密码</a>
+                  <a href="javascript:;" @click="handleResetPassword(record)">
+                    重置密码
+                  </a>
                 </a-menu-item>
               </a-menu>
             </a-dropdown>
@@ -112,7 +146,7 @@ export default {
     STable,
     UserModal,
   },
-  data () {
+  data() {
     return {
       loadingState: {
         query: false,
@@ -241,13 +275,13 @@ export default {
     }
   },
   computed: {
-    rowSelection () {
+    rowSelection() {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange,
       }
     },
-    tagColor () {
+    tagColor() {
       return function (index) {
         if (index > this.tagColors.length) {
           return this.tagColors[this.tagColors.length % index]
@@ -255,24 +289,29 @@ export default {
         return this.tagColors[index]
       }
     },
-    tableOpsVisible () {
+    tableOpsVisible() {
       return this.selectedRowKeys.length > 0
     },
   },
   methods: {
-    handleChange (value, key, column, record) {
+    handleChange(value, key, column, record) {
       record[column.dataIndex] = value
     },
     // eslint-disable-next-line
     del(row) {
       this.$log.debug('删除用户:', row.username)
-      this.handleDeleteUser(`真的要删除用户 ${row.username} 吗?`, [row.username])
+      this.handleDeleteUser(`真的要删除用户 ${row.username} 吗?`, [
+        row.username,
+      ])
     },
-    handleDeleteInBatch () {
+    handleDeleteInBatch() {
       this.$log.debug('批量删除用户:', this.selectedRowKeys)
-      this.handleDeleteUser('真的要批量删除所选中的用户吗?', this.selectedRowKeys)
+      this.handleDeleteUser(
+        '真的要批量删除所选中的用户吗?',
+        this.selectedRowKeys
+      )
     },
-    handleDeleteUser (message, userNames) {
+    handleDeleteUser(message, userNames) {
       const that = this
       this.$confirm({
         title: '警告',
@@ -280,22 +319,22 @@ export default {
         okText: '删除',
         okType: 'danger',
         cancelText: '取消',
-        onOk () {
+        onOk() {
           userApi.deleteUser(userNames).then((res) => {
             that.$message.success('删除用户成功')
             that.$refs.table.refresh()
           })
         },
-        onCancel () {
+        onCancel() {
           that.$log.info('Cancel')
         },
       })
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
+    onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    handleSearch () {
+    handleSearch() {
       this.loadingState.query = true
       this.$log.debug('搜索条件:', this.queryParam)
       this.$refs.table.refresh()
@@ -303,7 +342,7 @@ export default {
         this.loadingState.query = false
       }, 1500)
     },
-    handleSearchReset () {
+    handleSearchReset() {
       this.loadingState.reset = true
       this.queryParam = {}
       this.$refs.table.refresh()
@@ -311,15 +350,15 @@ export default {
         this.loadingState.reset = false
       }, 1500)
     },
-    onDatePickerChange (dates, dateStrings) {
+    onDatePickerChange(dates, dateStrings) {
       this.queryParam.createTimeFrom = dateStrings[0]
       this.queryParam.createTimeTo = dateStrings[1]
     },
-    handleModalOk () {
+    handleModalOk() {
       this.$log.debug('user create success')
       this.$refs.table.refresh()
     },
-    handleResetPassword (row) {
+    handleResetPassword(row) {
       const that = this
       this.$confirm({
         title: '警告',
@@ -327,21 +366,21 @@ export default {
         okText: '重置',
         okType: 'danger',
         cancelText: '取消',
-        onOk () {
+        onOk() {
           that.$log.debug('重置用户密码', row.username)
           userApi.resetPassword(row.username).then((res) => {
             that.$message.success('重置密码成功')
           })
         },
-        onCancel () {
+        onCancel() {
           that.$log.info('Cancel')
         },
       })
     },
-    handleLockUserInBatch () {
+    handleLockUserInBatch() {
       this.handleLockUser(this.selectedRowKeys)
     },
-    handleLockUser (userNames) {
+    handleLockUser(userNames) {
       const that = this
       this.$confirm({
         title: '警告',
@@ -349,14 +388,14 @@ export default {
         okText: '锁定',
         okType: 'danger',
         cancelText: '取消',
-        onOk () {
+        onOk() {
           that.$log.debug('所用用户', userNames)
           userApi.lockUser(userNames).then((res) => {
             that.$message.success('锁定用户成功')
             that.$refs.table.refresh()
           })
         },
-        onCancel () {
+        onCancel() {
           that.$log.info('Cancel')
         },
       })

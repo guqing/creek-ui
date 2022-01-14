@@ -1,5 +1,11 @@
 <template>
-  <a-modal title="操作" :visible="visible" :confirmLoading="confirmLoading" @ok="handleOk" @cancel="handleCancel">
+  <a-modal
+    title="操作"
+    :visible="visible"
+    :confirmLoading="confirmLoading"
+    @ok="handleOk"
+    @cancel="handleCancel"
+  >
     <a-spin :spinning="confirmLoading">
       <a-form :form="form" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-form-item label="ID" v-show="false">
@@ -7,6 +13,7 @@
         </a-form-item>
         <a-form-item label="用户名" has-feedback>
           <a-input
+            :disabled="usernameDisable"
             v-decorator="[
               'username',
               {
@@ -31,7 +38,11 @@
               'password',
               {
                 rules: [
-                  { required: rules.passwordRequired, message: '请输入密码', whitespace: true },
+                  {
+                    required: rules.passwordRequired,
+                    message: '请输入密码',
+                    whitespace: true,
+                  },
                   { min: 3, message: '字符长度必须大于3' },
                 ],
               },
@@ -56,12 +67,22 @@
 
         <a-form-item label="角色">
           <a-select
-            v-decorator="['roleIds', { rules: [{ required: true, validator: rules.roles }] }]"
+            v-decorator="[
+              'roleIds',
+              {
+                rules: [{ required: true, validator: rules.roles }],
+              },
+            ]"
             mode="multiple"
             style="width: 100%"
             placeholder="选择角色"
           >
-            <a-select-option :value="role.id" label="roleName" v-for="(role, index) in roles" :key="index">
+            <a-select-option
+              :value="role.id"
+              label="roleName"
+              v-for="(role, index) in roles"
+              :key="index"
+            >
               {{ role.roleName }}
             </a-select-option>
           </a-select>
@@ -84,46 +105,43 @@ const validateRoles = (rule, value, callback) => {
   }
 }
 
-const validateEmail = (rule, value, callback) => {
-  // 没有做任何修改
-  if (this.editParam.email === value) {
-    callback()
-    return
-  }
-
-  userApi.checkEmail(value).then((res) => {
-    if (res.data) {
-      callback(new Error('邮箱地址已经被使用'))
-    } else {
-      callback()
-    }
-  })
-}
-const validateUsername = (rule, value, callback) => {
-  if (!/^[A-Za-z0-9]+$/.test(value)) {
-    callback(new Error('只能输入字母或数字'))
-  } else if (this.editParam.username === value) {
-    callback()
-  } else {
-    userApi.checkUsername(value).then((res) => {
-      if (res.data) {
-        callback(new Error('用户名已经被使用'))
-      } else {
-        callback()
-      }
-    })
-  }
-}
-
 export default {
   name: 'UserModal',
-  data () {
+  data() {
     return {
+      usernameDisable: false,
       rules: {
         passwordRequired: true,
         roles: validateRoles,
-        email: validateEmail,
-        username: validateUsername,
+        email: (rule, value, callback) => {
+          // 没有做任何修改
+          if (this.editParam.email === value) {
+            callback()
+          }
+          userApi.checkEmail(value).then((res) => {
+            if (res.data) {
+              callback(new Error('邮箱地址已经被使用'))
+            } else {
+              callback()
+            }
+          })
+          callback()
+        },
+        username: (rule, value, callback) => {
+          if (!/^[A-Za-z0-9]+$/.test(value)) {
+            callback(new Error('只能输入字母或数字'))
+          } else if (this.editParam.username === value) {
+            callback()
+          } else {
+            userApi.checkUsername(value).then((res) => {
+              if (res.data) {
+                callback(new Error('用户名已经被使用'))
+              } else {
+                callback()
+              }
+            })
+          }
+        },
       },
       roles: [],
       labelCol: {
@@ -139,37 +157,43 @@ export default {
       confirmLoading: false,
     }
   },
-  beforeCreate () {
+  beforeCreate() {
     this.form = this.$form.createForm(this)
     this.$log.debug('form::', this.form)
   },
-  created () {
+  created() {
     this.handleRoleList()
   },
   methods: {
-    handleRoleList () {
+    handleRoleList() {
       roleApi.options().then((res) => {
         this.roles = res.data
       })
     },
-    add () {
+    add() {
       this.visible = true
     },
-    edit (record) {
+    edit(record) {
       this.visible = true
+      this.usernameDisable = record.isInternal
       // 编辑时不校验密码
       this.rules.passwordRequired = false
       this.editParam = Object.assign({}, record)
       this.$nextTick(() => {
-        this.form.setFieldsValue(pick(this.editParam, 'id', 'username', 'password', 'email'))
-        this.form.setFieldsValue({ roleIds: this.editParam.roleIds.map(Number) || [] })
+        this.form.setFieldsValue(
+          pick(this.editParam, 'id', 'username', 'password', 'email')
+        )
+        const roleIds = record.roles.map((item) => item.id) || []
+        this.form.setFieldsValue({
+          roleIds: roleIds,
+        })
       })
     },
-    close () {
+    close() {
       this.$emit('close')
       this.visible = false
     },
-    handleOk () {
+    handleOk() {
       const that = this
       // 触发表单验证
       this.form.validateFields((err, values) => {
@@ -187,7 +211,7 @@ export default {
         }
       })
     },
-    handleUpdateUser (values) {
+    handleUpdateUser(values) {
       userApi
         .update(values)
         .then((res) => {
@@ -201,7 +225,7 @@ export default {
           this.close()
         })
     },
-    handleCreateUser (values) {
+    handleCreateUser(values) {
       userApi
         .create(values)
         .then((res) => {
@@ -215,7 +239,7 @@ export default {
           this.close()
         })
     },
-    handleCancel () {
+    handleCancel() {
       this.form.resetFields()
       this.close()
     },
