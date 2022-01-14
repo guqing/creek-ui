@@ -52,8 +52,6 @@ export default {
   data() {
     return {
       resources: [],
-      indeterminates: [],
-      checked: [],
     }
   },
   mounted() {
@@ -103,9 +101,10 @@ export default {
           return target.scopes
         })
         .flatMap((item) => item)
-        .filter((item) => {
-          this.$set(item, 'checked', true)
-        })
+        .filter((item) => item.checked === true)
+    },
+    reset() {
+      this.listResource()
     },
   },
 }

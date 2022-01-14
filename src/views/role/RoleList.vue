@@ -46,21 +46,24 @@
       :alert="false"
     >
       <span slot="action" slot-scope="text, record">
-        <template>
+        <div v-if="record.isInternal">
+          <a href="javascript:;">详情</a>
+        </div>
+        <div v-else>
           <a @click="handleRoleEdit(record)">编辑</a>
           <a-divider type="vertical" />
-        </template>
-        <a-dropdown>
-          <a class="ant-dropdown-link"> 更多 <a-icon type="down" /> </a>
-          <a-menu slot="overlay">
-            <a-menu-item>
-              <a href="javascript:;">详情</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">删除</a>
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
+          <a-dropdown>
+            <a class="ant-dropdown-link"> 更多 <a-icon type="down" /> </a>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a href="javascript:;">详情</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a href="javascript:;" @click="deleteRole(record)">删除</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
+        </div>
       </span>
     </s-table>
     <RoleModal
@@ -95,7 +98,6 @@ export default {
         reset: false,
       },
       modalVisiable: false,
-      roleForm: {},
       // 查询参数
       queryParam: {},
       // 表头
@@ -165,14 +167,9 @@ export default {
       roleApi.createOrUpdate(value).then(() => {
         this.modalVisiable = false
         this.$message.success('保存成功')
-        this.handleResetRoleForm()
         this.$refs.table.refresh()
+        this.$refs.roleModal.reset()
       })
-    },
-    handleResetRoleForm() {
-      this.roleForm = {}
-      this.checkedMenuKeys = []
-      this.expandedMenuKeys = []
     },
     handleSearch() {
       this.loadingState.query = true
@@ -188,6 +185,12 @@ export default {
       setTimeout(() => {
         this.loadingState.reset = false
       }, 1500)
+    },
+    deleteRole(record) {
+      roleApi.deleteById(record.id).then((res) => {
+        this.$message.success('删除成功')
+        this.$refs.table.refresh(true)
+      })
     },
   },
 }

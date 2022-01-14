@@ -1,8 +1,9 @@
 <template>
   <a-modal
-    title="Title"
+    title="新增角色"
     :visible="visible"
     @cancel="handleCancel"
+    on-ok="handleOk"
     destroyOnClose
   >
     <div class="steps-action">
@@ -122,9 +123,12 @@ export default {
       this.$emit('ok', this.roleForm)
     },
     handleCancel() {
+      this.reset()
+      this.$emit('cancel')
+    },
+    reset() {
       this.current = 0
       this.roleForm = {}
-      this.$emit('cancel')
     },
   },
 }
