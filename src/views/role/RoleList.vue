@@ -47,7 +47,9 @@
     >
       <span slot="action" slot-scope="text, record">
         <div v-if="record.isInternal">
-          <a href="javascript:;">详情</a>
+          <a href="javascript:;" @click="() => $refs.detail.show(record)">
+            详情
+          </a>
         </div>
         <div v-else>
           <a @click="handleRoleEdit(record)">编辑</a>
@@ -56,7 +58,9 @@
             <a class="ant-dropdown-link"> 更多 <a-icon type="down" /> </a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a href="javascript:;">详情</a>
+                <a href="javascript:;" @click="() => $refs.detail.show(record)">
+                  详情
+                </a>
               </a-menu-item>
               <a-menu-item>
                 <a href="javascript:;" @click="deleteRole(record)">删除</a>
@@ -72,6 +76,7 @@
       @cancel="() => (modalVisiable = false)"
       @ok="handleSaveOrUpdateRole"
     />
+    <DetailModal ref="detail" />
   </a-card>
 </template>
 
@@ -81,6 +86,7 @@ import roleApi from '@/api/role'
 import { baseMixin } from '@/store/app-mixin'
 import ApiScope from './modules/ApiScope.vue'
 import RoleModal from './modules/RoleModal.vue'
+import DetailModal from './modules/DetailModal.vue'
 
 export default {
   name: 'TreeList',
@@ -89,6 +95,7 @@ export default {
     STable,
     ApiScope,
     RoleModal,
+    DetailModal,
   },
   data() {
     return {

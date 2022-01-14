@@ -16,7 +16,9 @@ const defaultRoutePath = '/dashboard/workplace'
 
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
-  to.meta && typeof to.meta.title !== 'undefined' && setDocumentTitle(`${i18nRender(to.meta.title)} - ${domTitle}`)
+  to.meta &&
+    typeof to.meta.title !== 'undefined' &&
+    setDocumentTitle(`${i18nRender(to.meta.title)} - ${domTitle}`)
   /* has token */
   if (storage.get(ACCESS_TOKEN)) {
     if (to.path === loginRoutePath) {
@@ -33,7 +35,9 @@ router.beforeEach((to, from, next) => {
               // 根据 roles 权限生成可访问的路由表
               // 动态添加可访问路由表
               router.addRoutes(store.getters.addRouters)
-              const redirect = decodeURIComponent(from.query.redirect || to.path)
+              const redirect = decodeURIComponent(
+                from.query.redirect || to.path
+              )
               if (to.path === redirect) {
                 // hack 方法 确保 addRoutes 已完成，set the replace: true so the navigation will not leave a history record
                 next({ ...to, replace: true })
