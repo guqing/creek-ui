@@ -121,6 +121,12 @@ export const asyncRouterMap = [
         ],
       },
       {
+        name: 'credentials',
+        path: '/credentials',
+        meta: { title: '令牌管理', icon: 'safety-certificate' },
+        component: () => import('@/views/credentials/List'),
+      },
+      {
         name: 'Account',
         path: '/account',
         redirect: '/account/center',
